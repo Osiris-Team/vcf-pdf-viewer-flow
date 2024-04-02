@@ -50,12 +50,22 @@ public class PdfEditorFrameAlt extends IFrame implements HasStyle {
     static {
         try {
             editorHtml = Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/viewer-orig.html"));
+
             editorHtml = editorHtml.replace("/* INSERT viewer-orig.css STYLE */",
                     Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/viewer-orig.css")));
+
+            editorHtml = editorHtml.replace("/* INSERT pdf.worker.mjs SCRIPT */",
+                    Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/pdf.worker.mjs")));
+
             editorHtml = editorHtml.replace("/* INSERT pdf.mjs SCRIPT */",
                     Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/pdf.mjs")));
+
+            editorHtml = editorHtml.replace("/* INSERT worker-importer.js SCRIPT */",
+                    Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/worker-importer.js")));
+
             editorHtml = editorHtml.replace("/* INSERT viewer.mjs SCRIPT */",
                     Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/viewer.mjs")));
+
             editorHtml = editorHtml.replace("/* INSERT viewer-iframe-connector.js SCRIPT */",
                     Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/viewer-iframe-connector.js")));
         } catch (IOException e) {

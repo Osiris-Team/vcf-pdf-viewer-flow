@@ -502,7 +502,10 @@ See https://github.com/adobe-type-tools/cmap-resources
 </div> <!-- outerContainer -->
 <div id="printContainer"></div>
 
-
+<script type="text/js-worker">
+    // This script WON'T be parsed by JS engines because its MIME type is text/js-worker.
+    /* INSERT pdf.worker.mjs SCRIPT */
+</script>
 <script type="module">
     /* INSERT pdf.mjs SCRIPT */
 </script>

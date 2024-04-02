@@ -45,10 +45,19 @@ public class PdfEditorFrame extends Html implements HasStyle {
     static {
         try {
             editorHtml = Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/viewer-mod.html"));
+
             editorHtml = editorHtml.replace("/* INSERT viewer-mod.css STYLE */",
                     Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/viewer-mod.css")));
+
+            editorHtml = editorHtml.replace("/* INSERT pdf.worker.mjs SCRIPT */",
+                    Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/pdf.worker.mjs")));
+
             editorHtml = editorHtml.replace("/* INSERT pdf.mjs SCRIPT */",
                     Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/pdf.mjs")));
+
+            editorHtml = editorHtml.replace("/* INSERT worker-importer.js SCRIPT */",
+                    Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/worker-importer.js")));
+
             editorHtml = editorHtml.replace("/* INSERT viewer.mjs SCRIPT */",
                     Utils.toUTF8String(Utils.getResource("/META-INF/resources/frontend/pdfjs/viewer.mjs")));
         } catch (IOException e) {
