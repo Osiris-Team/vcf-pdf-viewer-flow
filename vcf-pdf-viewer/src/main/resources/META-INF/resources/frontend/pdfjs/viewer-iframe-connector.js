@@ -85,6 +85,9 @@
                     window.PDFViewerApplication.load(pdfDoc);
                 });
             }
+            if (type == 'execute-js') {
+                eval(msg);
+            }
         }
 
 

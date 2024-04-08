@@ -176,4 +176,8 @@ public class PdfEditorFrameAlt extends IFrame implements HasStyle {
         sendMessage("add-blank-page", "");
     }
 
+    public void executeJS(String js){
+        sendMessage("execute-js", js);
+    }
+
 }
