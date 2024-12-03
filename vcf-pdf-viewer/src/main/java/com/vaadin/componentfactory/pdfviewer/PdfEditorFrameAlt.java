@@ -22,19 +22,18 @@ package com.vaadin.componentfactory.pdfviewer;
 
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.HasStyle;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.IFrame;
+import com.vaadin.flow.component.page.PendingJavaScriptResult;
+import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.server.AbstractStreamResource;
 import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.shared.communication.PushMode;
+import elemental.json.JsonValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Base64;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 //@CssImport("./pdfjs/combined-viewer-prod.css")
@@ -127,16 +126,63 @@ public class PdfEditorFrameAlt extends IFrame implements HasStyle {
         sendMessage("change-pdf-request", url);
     }
 
-    public void executeSafeJS(String js, Serializable... parameters){
+    public PendingJavaScriptResult executeSafeJS(String js, Serializable... parameters){
         PdfEditorFrameAlt this_ = this;
-        if(!isPdfJsLoaded) onPdfJsLoaded.add(new Runnable() {
-            @Override
-            public void run() {
-                this_.getElement().executeJs(js, parameters); // Run later
-                onPdfJsLoaded.remove(this);
+        if(!isPdfJsLoaded) {
+
+            class Pair{
+                public final SerializableConsumer<JsonValue> resultHandler;
+                public final SerializableConsumer<String> errorHandler;
+
+                public Pair(SerializableConsumer<JsonValue> resultHandler, SerializableConsumer<String> errorHandler) {
+                    this.resultHandler = resultHandler;
+                    this.errorHandler = errorHandler;
+                }
             }
-        });
-        else this.getElement().executeJs(js, parameters); // Run now
+
+            class Fake implements PendingJavaScriptResult{
+                public final CopyOnWriteArrayList<Pair> thens = new CopyOnWriteArrayList<>();
+                public PendingJavaScriptResult real = null;
+
+                @Override
+                public boolean cancelExecution() {
+                    if(real != null) return real.cancelExecution();
+                    return false;
+                }
+
+                @Override
+                public boolean isSentToBrowser() {
+                    if(real != null) return real.isSentToBrowser();
+                    return false;
+                }
+
+                @Override
+                public void then(SerializableConsumer<JsonValue> resultHandler, SerializableConsumer<String> errorHandler) {
+                    thens.add(new Pair(resultHandler, errorHandler));
+                }
+            };
+
+            Fake fake = new Fake();
+            onPdfJsLoaded.add(new Runnable() {
+                @Override
+                public void run() {
+                    PendingJavaScriptResult real = this_.getElement().executeJs(js, parameters); // Run later
+                    onPdfJsLoaded.remove(this);
+                    fake.real = real;
+                    real.then((result) -> {
+                        for (Pair p : fake.thens) {
+                            p.resultHandler.accept(result);
+                        }
+                    }, (error) -> {
+                        for (Pair p : fake.thens) {
+                            p.errorHandler.accept(error);
+                        }
+                    });
+                }
+            });
+            return fake;
+        }
+        else return this.getElement().executeJs(js, parameters); // Run now
     }
 
     public void setSrc(AbstractStreamResource src) {
