@@ -1,4 +1,4 @@
-# Pdf Viewer component for Vaadin Flow
+# Pdf Viewer/Editor component for Vaadin Flow
 
 ## Get this fork via [JitPack](https://jitpack.io/#Osiris-Team/vcf-pdf-viewer-flow/LATEST).
 
