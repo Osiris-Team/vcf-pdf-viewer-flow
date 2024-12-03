@@ -99,19 +99,19 @@ public class PdfEditorFrameAlt extends IFrame implements HasStyle {
         });
     }
 
-    public void sendMessage(String type, String msg){
-        executeSafeJS("$0.contentWindow.postMessage({'type': `"+type+"`, 'msg': `"+msg+"`}, '*');", this);
+    public PendingJavaScriptResult sendMessage(String type, String msg){
+        return executeSafeJS("$0.contentWindow.postMessage({'type': `"+type+"`, 'msg': `"+msg+"`}, '*');", this);
     }
 
 
     private AbstractStreamResource src;
     private AbstractStreamResource pdfSrc;
 
-    public void setPdfSrc(StreamResource src){
+    public PendingJavaScriptResult setPdfSrc(StreamResource src){
         this.pdfSrc = src;
         getElement().setAttribute("pdfsrc", src);
         String url = getElement().getAttribute("pdfsrc");
-        setPdfSrc(url);
+        return setPdfSrc(url);
     }
 
     public String getPdfSrcUrl() {
@@ -122,8 +122,8 @@ public class PdfEditorFrameAlt extends IFrame implements HasStyle {
         return pdfSrc;
     }
 
-    public void setPdfSrc(String url){
-        sendMessage("change-pdf-request", url);
+    public PendingJavaScriptResult setPdfSrc(String url){
+        return sendMessage("change-pdf-request", url);
     }
 
     public PendingJavaScriptResult executeSafeJS(String js, Serializable... parameters){
@@ -218,15 +218,15 @@ public class PdfEditorFrameAlt extends IFrame implements HasStyle {
         sendMessage("save-request", "");
     }
 
-    public void addBlankPage() {
-        sendMessage("add-blank-page", "");
+    public PendingJavaScriptResult addBlankPage() {
+        return sendMessage("add-blank-page", "");
     }
 
     /**
      * Do not use `` as quotes, since that is already used to encapsulate your js code in.
      */
-    public void executeJS(String js){
-        sendMessage("execute-js", js);
+    public PendingJavaScriptResult executeJS(String js){
+        return sendMessage("execute-js", js);
     }
 
 }
